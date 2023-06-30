@@ -1,8 +1,10 @@
 "use client";
 import { SessionInterface } from "@/src/common.types";
 import Image from "next/image";
-import { ChangeEvent, FC } from "react";
+import { ChangeEvent, FC, useState } from "react";
 import FormField from "./FormField";
+import { categoryFilters } from "@/constants";
+import CustomMenu from "./CustomMenu";
 
 interface ProjectFormProps {
   type: string;
@@ -11,11 +13,44 @@ interface ProjectFormProps {
 
 const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
   const handleFormSubmit = (e: React.FormEvent) => {};
-  const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {};
-  const handleStateChange = (fieldName: string, value: string) => {};
+  const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.includes("image"))
+      return alert("Please upload an image file");
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      const result = reader.result as string;
+
+      handleStateChange("image", result);
+    };
+  };
+  const handleStateChange = (fieldName: string, value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      [fieldName]: value,
+    }));
+  };
   const image = null;
 
-  const form = { title: "Title", image: "" };
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    image: "",
+    liveSiteUrl: "",
+    githubUrl: "",
+    category: "",
+  });
+
   return (
     <form onSubmit={handleFormSubmit} className="flexStart form">
       <div className="flexStart form_image-container">
@@ -46,6 +81,37 @@ const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
         placeholder="Flexibble"
         setState={(value) => handleStateChange("title", value)}
       />
+      <FormField
+        title="Description"
+        state={form.description}
+        placeholder="Showcase and discover remarkable developer projects"
+        setState={(value) => handleStateChange("description", value)}
+      />
+      <FormField
+        type="url"
+        title="Live Site URL"
+        state={form.liveSiteUrl}
+        placeholder="https://www.vercel.com"
+        setState={(value) => handleStateChange("liveSiteUrl", value)}
+      />
+      <FormField
+        type="url"
+        title="Github URL"
+        state={form.githubUrl}
+        placeholder="https://www.github.com"
+        setState={(value) => handleStateChange("githubUrl", value)}
+      />
+
+      <CustomMenu
+        title="Category"
+        state={form.category}
+        filters={categoryFilters}
+        setState={(value) => handleStateChange("category", value)}
+      />
+
+      <div className="flexStart w-full">
+        <button>Create</button>
+      </div>
     </form>
   );
 };
