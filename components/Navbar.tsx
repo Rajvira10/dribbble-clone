@@ -4,6 +4,8 @@ import Link from "next/link";
 import { FC } from "react";
 import AuthProviders from "./AuthProviders";
 import { getCurrentUser } from "@/lib/session";
+import { signOut } from "next-auth/react";
+import ProfileMenu from "./ProfileMenu";
 
 const Navbar = async ({}) => {
   const session = await getCurrentUser();
@@ -25,16 +27,8 @@ const Navbar = async ({}) => {
       <div className="flexCenter gap-4">
         {session?.user ? (
           <>
-            {session?.user?.image && (
-              <Image
-                src={session.user.image}
-                width={40}
-                height={40}
-                className="rounded-full"
-                alt={session.user.name}
-              />
-            )}
-            <Link href="/create-project">Share Work</Link>{" "}
+            <ProfileMenu session={session} />
+            <Link href="/create-project">Share Work</Link>
           </>
         ) : (
           <AuthProviders />
