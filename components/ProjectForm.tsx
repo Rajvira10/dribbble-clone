@@ -5,6 +5,7 @@ import { ChangeEvent, FC, useState } from "react";
 import FormField from "./FormField";
 import { categoryFilters } from "@/constants";
 import CustomMenu from "./CustomMenu";
+import Button from "./Button";
 
 interface ProjectFormProps {
   type: string;
@@ -12,7 +13,16 @@ interface ProjectFormProps {
 }
 
 const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
-  const handleFormSubmit = (e: React.FormEvent) => {};
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setIsSubmitting(true);
+
+    try {
+      if (type === "create") {
+      }
+    } catch (error) {}
+  };
   const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
 
@@ -110,7 +120,16 @@ const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
       />
 
       <div className="flexStart w-full">
-        <button>Create</button>
+        <Button
+          title={
+            isSubmitting
+              ? `${type === "create" ? "Creating" : "Editing"}`
+              : `${type === "create" ? "Create" : "Edit"}`
+          }
+          type="submit"
+          leftIcon={isSubmitting ? "" : "/plus.svg"}
+          isSubmitting={isSubmitting}
+        />
       </div>
     </form>
   );
