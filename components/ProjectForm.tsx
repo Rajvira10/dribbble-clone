@@ -17,7 +17,6 @@ const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
     e.preventDefault();
 
     setIsSubmitting(true);
-
     try {
       if (type === "create") {
       }
