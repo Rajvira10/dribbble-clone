@@ -6,6 +6,8 @@ import FormField from "./FormField";
 import { categoryFilters } from "@/constants";
 import CustomMenu from "./CustomMenu";
 import Button from "./Button";
+import { createNewProject, fetchToken } from "@/lib/actions";
+import { useRouter } from "next/navigation";
 
 interface ProjectFormProps {
   type: string;
@@ -13,15 +15,27 @@ interface ProjectFormProps {
 }
 
 const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setIsSubmitting(true);
+
+    const { token } = await fetchToken();
     try {
       if (type === "create") {
+        await createNewProject(form, session?.user?.id, token);
+        router.push("/");
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
 
@@ -41,15 +55,15 @@ const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
       handleStateChange("image", result);
     };
   };
+
   const handleStateChange = (fieldName: string, value: string) => {
     setForm((prev) => ({
       ...prev,
       [fieldName]: value,
     }));
   };
-  const image = null;
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const image = null;
 
   const [form, setForm] = useState({
     title: "",
@@ -64,21 +78,21 @@ const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
     <form onSubmit={handleFormSubmit} className="flexStart form">
       <div className="flexStart form_image-container">
         <label htmlFor="poster" className="flexCenter form_image-label">
-          {!image && "Choose a poster for your project"}
+          {!form.image && "Choose a poster for your project"}
         </label>
         <input
-          type="file"
           id="image"
+          type="file"
           accept="image/*"
-          required={type === "create"}
-          className="form_image-output"
-          onChange={handleChangeImage}
+          required={type === "create" ? true : false}
+          className="form_image-input"
+          onChange={(e) => handleChangeImage(e)}
         />
         {form.image && (
           <Image
             src={form?.image}
             className="sm:p-10 object-contain z-20"
-            alt="Project poster"
+            alt="image"
             fill
           />
         )}
@@ -90,24 +104,28 @@ const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
         placeholder="Flexibble"
         setState={(value) => handleStateChange("title", value)}
       />
+
       <FormField
         title="Description"
         state={form.description}
-        placeholder="Showcase and discover remarkable developer projects"
+        placeholder="Showcase and discover remarkable developer projects."
+        isTextArea
         setState={(value) => handleStateChange("description", value)}
       />
+
       <FormField
         type="url"
-        title="Live Site URL"
+        title="Website URL"
         state={form.liveSiteUrl}
-        placeholder="https://www.vercel.com"
+        placeholder="https://jsmastery.pro"
         setState={(value) => handleStateChange("liveSiteUrl", value)}
       />
+
       <FormField
         type="url"
-        title="Github URL"
+        title="GitHub URL"
         state={form.githubUrl}
-        placeholder="https://www.github.com"
+        placeholder="https://github.com/adrianhajdin"
         setState={(value) => handleStateChange("githubUrl", value)}
       />
 
