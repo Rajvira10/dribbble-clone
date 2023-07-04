@@ -1,4 +1,4 @@
-** Tech Stack
+## Tech Stack
 1. NextJs
 2. TypeScript
 3. GraphQL
