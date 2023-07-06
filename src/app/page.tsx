@@ -19,14 +19,21 @@ type ProjectsSearch = {
 
 type SearchParams = {
   category?: string;
+  endCursor: string;
 };
 
 type Props = {
   searchParams: SearchParams;
 };
 
-export default async function Home({ searchParams: { category } }: Props) {
-  const data = (await fetchAllProjects(category)) as ProjectsSearch;
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+export const revalidate = 0;
+
+export default async function Home({
+  searchParams: { category, endCursor },
+}: Props) {
+  const data = (await fetchAllProjects(category, endCursor)) as ProjectsSearch;
   const projectsToDisplay = data?.projectSearch?.edges || [];
 
   if (projectsToDisplay.length === 0) {
