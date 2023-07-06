@@ -1,20 +1,21 @@
 "use client";
-import { SessionInterface } from "@/src/common.types";
+import { ProjectInterface, SessionInterface } from "@/src/common.types";
 import Image from "next/image";
 import { ChangeEvent, FC, useState } from "react";
 import FormField from "./FormField";
 import { categoryFilters } from "@/constants";
 import CustomMenu from "./CustomMenu";
 import Button from "./Button";
-import { createNewProject, fetchToken } from "@/lib/actions";
+import { createNewProject, fetchToken, updateProject } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 
 interface ProjectFormProps {
   type: string;
   session: SessionInterface;
+  project?: ProjectInterface;
 }
 
-const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
+const ProjectForm: FC<ProjectFormProps> = ({ type, session, project }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
@@ -27,6 +28,10 @@ const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
     try {
       if (type === "create") {
         await createNewProject(form, session?.user?.id, token);
+        router.push("/");
+      }
+      if (type === "edit") {
+        await updateProject(form, project?.id as string, token);
         router.push("/");
       }
     } catch (error) {
@@ -66,12 +71,12 @@ const ProjectForm: FC<ProjectFormProps> = ({ type, session }) => {
   const image = null;
 
   const [form, setForm] = useState({
-    title: "",
-    description: "",
-    image: "",
-    liveSiteUrl: "",
-    githubUrl: "",
-    category: "",
+    title: project?.title || "",
+    description: project?.description || "",
+    image: project?.image || "",
+    liveSiteUrl: project?.liveSiteUrl || "",
+    githubUrl: project?.githubUrl || "",
+    category: project?.category || "",
   });
 
   return (
